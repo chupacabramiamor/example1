@@ -1,0 +1,39 @@
+version: '2'
+
+services:
+    app:
+        container_name: "artm.vivaprivacy.app"
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "8888:80"
+            - "60010:6001"
+        volumes:
+            - .:/app/htdocs
+        links:
+            - mysql
+        restart: always
+        environment:
+            WEBROOT: "/app/htdocs/public"
+            UMASK: 022
+            PUID: ${USERID}
+            PGID: ${GROUPID}
+    mysql:
+        image: mysql:5.7
+        container_name: "artm.mysql57"
+        command: --default-authentication-plugin=mysql_native_password
+        volumes:
+            - ./mysql/data:/var/lib/mysql
+        expose:
+            - 3306
+        ports:
+            - 33066:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: 123456
+            MYSQL_DATABASE: vivapp
+        restart: always
+
+    redis:
+        container_name: "artm.redis"
+        image: redis:latest
